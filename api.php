@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 3839 $ $Date:: 2016-04-26 #$ $Author: serge $
+// $Revision: 4368 $ $Date:: 2016-08-08 #$ $Author: serge $
 
 namespace generic_api;
 
@@ -52,7 +52,7 @@ class Api
 
         $req = new \generic_protocol\AuthenticateRequest( $login, $password );
 
-        $resp = $this->submit_req_and_parse_priv( $req );
+        $resp = $this->submit_req_and_parse( $req );
 
         if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
         {
@@ -81,7 +81,7 @@ class Api
 
         $req = new \generic_protocol\CloseSessionRequest( $this->session_id );
 
-        $resp = $this->submit_req_and_parse_priv( $req );
+        $resp = $this->submit_req_and_parse( $req );
 
         $this->session_id = NULL;
 
@@ -95,7 +95,7 @@ class Api
             return new \generic_protocol\ErrorResponse( \generic_protocol\ErrorResponse::RUNTIME_ERROR, "session is not opened" );
         }
 
-        return $this->submit_req_and_parse_priv( $req );
+        return $this->submit_session_req_and_parse( $req );
     }
 
     protected function parse_response( $resp )
@@ -103,17 +103,35 @@ class Api
         return \generic_protocol\parse_response( $resp );
     }
 
-    private function send_to_host( $command, & $res, & $error_msg )
+    protected function get_session_id()
     {
-        return \tcp_send( $this->host, $this->port, $command . "<EOM>", $res, $error_msg);
+        return $this->session_id;
     }
 
-    private function submit_and_parse( $command )
+    private function submit_session_req_and_parse( $req )
+    {
+        if( $this->is_session_open() == false )
+        {
+            exit( "FATAL: session is not open" );
+        }
+
+        // automatically add session id to all requests
+        $req->set_session_id( $this->session_id );
+   
+        return $this->submit_req_and_parse( $req );
+    }
+
+    private function submit_req_and_parse( $req )
+    {
+        return $this->submit_raw_and_parse( $req->to_generic_request() );
+    }
+
+    private function submit_raw_and_parse( $command )
     {
         $resp = "";
         $error_msg = "";
 
-        $b = $this->send_to_host( $command, $resp, $error_msg );
+        $b = $this->submit_raw( $command, $resp, $error_msg );
 
         if( $b == true )
         {
@@ -127,9 +145,9 @@ class Api
         return $parsed;
     }
 
-    private function submit_req_and_parse_priv( $req )
+    private function submit_raw( $command, & $res, & $error_msg )
     {
-        return $this->submit_and_parse( $req->to_generic_request() );
+        return \tcp_send( $this->host, $this->port, $command . "<EOM>", $res, $error_msg );
     }
 
     private $host;       // host
