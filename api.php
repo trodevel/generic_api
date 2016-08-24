@@ -21,13 +21,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 4368 $ $Date:: 2016-08-08 #$ $Author: serge $
+// $Revision: 4395 $ $Date:: 2016-08-19 #$ $Author: serge $
 
 namespace generic_api;
 
-require_once 'generic_protocol/generic_protocol.php';
-require_once 'generic_protocol/response_parser.php';    // parse_response()
-require_once 'php_snippets/tcp_send.php';    // tcp_send()
+require_once '../generic_protocol/generic_protocol.php';
+require_once '../generic_protocol/response_parser.php';    // parse_response()
+require_once '../php_snippets/tcp_send.php';  // tcp_send()
 
 class Api
 {
@@ -117,7 +117,7 @@ class Api
 
         // automatically add session id to all requests
         $req->set_session_id( $this->session_id );
-   
+
         return $this->submit_req_and_parse( $req );
     }
 
