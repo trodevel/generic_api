@@ -21,13 +21,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 4411 $ $Date:: 2016-09-17 #$ $Author: serge $
+// $Revision: 5995 $ $Date:: 2017-03-13 #$ $Author: serge $
 
 namespace generic_api;
 
-require_once '../generic_protocol/generic_protocol.php';
-require_once '../generic_protocol/response_parser.php';    // parse_response()
-require_once '../php_snippets/tcp_send.php';  // tcp_send()
+require_once __DIR__.'/../generic_protocol/generic_protocol.php';
+require_once __DIR__.'/../generic_protocol/response_parser.php';    // parse_response()
+require_once __DIR__.'/../php_snippets/tcp_send.php';  // tcp_send()
 
 class Api
 {
