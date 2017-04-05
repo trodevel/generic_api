@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 5995 $ $Date:: 2017-03-13 #$ $Author: serge $
+// $Revision: 6435 $ $Date:: 2017-04-04 #$ $Author: serge $
 
 namespace generic_api;
 
@@ -37,19 +37,8 @@ class Api
         $this->port = $port;
     }
 
-    public function is_session_open()
+    public function open_session( $login, $password, & $session_id, & $error_msg )
     {
-        return !empty( $this->session_id );
-    }
-
-    public function open_session( $login, $password, & $error_msg )
-    {
-        if( $this->is_session_open() )
-        {
-            $error_msg = "session is already opened";
-            return false;
-        }
-
         $req = new \generic_protocol\AuthenticateRequest( $login, $password );
 
         $resp = $this->submit_req_and_parse( $req );
@@ -61,7 +50,7 @@ class Api
         }
         elseif( get_class( $resp ) == "generic_protocol\AuthenticateResponse" )
         {
-            $this->session_id = $resp->session_id;
+            $session_id = $resp->session_id;
             return true;
         }
 
@@ -70,55 +59,35 @@ class Api
         return false;
     }
 
-    function close_session( & $error_msg )
+    public function close_session( $session_id, & $error_msg )
     {
-        if( $this->is_session_open() == false )
-        {
-            $error_msg = "session is not opened";
-
-            return false;
-        }
-
-        $req = new \generic_protocol\CloseSessionRequest( $this->session_id );
+        $req = new \generic_protocol\CloseSessionRequest( $session_id );
 
         $resp = $this->submit_req_and_parse( $req );
 
-        $this->session_id = NULL;
+        if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
+        {
+            $error_msg = $resp->descr;
+            return false;
+        }
+        elseif( get_class( $resp ) == "generic_protocol\CloseSessionResponse" )
+        {
+            return true;
+        }
 
-        return true;
+        $error_msg = "unknown response";
+
+        return false;
     }
 
     public function submit( $req )
     {
-        if( $this->is_session_open() == false )
-        {
-            return new \generic_protocol\ErrorResponse( \generic_protocol\ErrorResponse::RUNTIME_ERROR, "session is not opened" );
-        }
-
-        return $this->submit_session_req_and_parse( $req );
+        return $this->submit_req_and_parse( $req );
     }
 
     protected function parse_response( $resp )
     {
         return \generic_protocol\parse_response( $resp );
-    }
-
-    protected function get_session_id()
-    {
-        return $this->session_id;
-    }
-
-    private function submit_session_req_and_parse( $req )
-    {
-        if( $this->is_session_open() == false )
-        {
-            exit( "FATAL: session is not open" );
-        }
-
-        // automatically add session id to all requests
-        $req->set_session_id( $this->session_id );
-
-        return $this->submit_req_and_parse( $req );
     }
 
     private function submit_req_and_parse( $req )
@@ -152,7 +121,6 @@ class Api
 
     private $host;       // host
     private $port;       // port
-    private $session_id; // session_id
 }
 
 ?>
