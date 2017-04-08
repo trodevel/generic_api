@@ -21,12 +21,12 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 6435 $ $Date:: 2017-04-04 #$ $Author: serge $
+// $Revision: 6542 $ $Date:: 2017-04-07 #$ $Author: serge $
 
 namespace generic_api;
 
 require_once __DIR__.'/../generic_protocol/generic_protocol.php';
-require_once __DIR__.'/../generic_protocol/response_parser.php';    // parse_response()
+require_once __DIR__.'/../generic_protocol/response_parser.php';    // ResponseParser::parse()
 require_once __DIR__.'/../php_snippets/tcp_send.php';  // tcp_send()
 
 class Api
@@ -87,7 +87,7 @@ class Api
 
     protected function parse_response( $resp )
     {
-        return \generic_protocol\parse_response( $resp );
+        return \generic_protocol\ResponseParser::parse( $resp );
     }
 
     private function submit_req_and_parse( $req )
