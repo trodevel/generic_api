@@ -1,8 +1,9 @@
 <?php
-// $Revision: 6462 $ $Date:: 2017-04-05 #$ $Author: serge $
+// $Revision: 7577 $ $Date:: 2017-08-11 #$ $Author: serge $
 
 require_once 'api.php';
 require_once 'credentials.php';
+require_once __DIR__.'/../generic_protocol/str_helper.php';
 
 $error_msg = "";
 
@@ -103,7 +104,7 @@ echo "TEST: get user id\n";
 
         echo "REQ = " . $req->to_generic_request() . "\n";
         $resp = $api->submit( $req );
-        echo "RESP = " . $resp->to_html() . "\n\n";
+        echo "RESP = " . \generic_protocol\to_html( $resp ) . "\n\n";
 
         if( $api->close_session( $session_id, $error_msg ) == true )
         {
@@ -137,7 +138,7 @@ echo "\n";
 
         echo "REQ = " . $req->to_generic_request() . "\n";
         $resp = $api->submit( $req );
-        echo "RESP = " . $resp->to_html() . "\n\n";
+        echo "RESP = " . \generic_protocol\to_html( $resp ) . "\n\n";
 
         if( $api->close_session( $session_id, $error_msg ) == true )
         {
