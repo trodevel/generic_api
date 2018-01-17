@@ -1,5 +1,5 @@
 <?php
-// $Revision: 7577 $ $Date:: 2017-08-11 #$ $Author: serge $
+// $Revision: 8534 $ $Date:: 2018-01-17 #$ $Author: serge $
 
 require_once 'api.php';
 require_once 'credentials.php';
@@ -135,6 +135,39 @@ echo "\n";
         echo "OK: opened session\n";
 
         $req = new \generic_protocol\GetUserIdRequest( $session_id, "test2" );
+
+        echo "REQ = " . $req->to_generic_request() . "\n";
+        $resp = $api->submit( $req );
+        echo "RESP = " . \generic_protocol\to_html( $resp ) . "\n\n";
+
+        if( $api->close_session( $session_id, $error_msg ) == true )
+        {
+            echo "OK: session closed\n";
+        }
+        else
+        {
+            echo "ERROR: cannot close session: $error_msg\n";
+        }
+    }
+    else
+    {
+        echo "ERROR: cannot open session: $error_msg\n";
+    }
+}
+
+echo "\n";
+echo "TEST: get session info\n";
+echo "\n";
+{
+    $api = new \generic_api\Api( $host, $port );
+
+    $session_id = NULL;
+
+    if( $api->open_session( $login, $password, $session_id, $error_msg ) == true )
+    {
+        echo "OK: opened session\n";
+
+        $req = new \generic_protocol\GetSessionInfoRequest( $session_id, $session_id );
 
         echo "REQ = " . $req->to_generic_request() . "\n";
         $resp = $api->submit( $req );
