@@ -21,13 +21,13 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 6542 $ $Date:: 2017-04-07 #$ $Author: serge $
+// $Revision: 9821 $ $Date:: 2018-10-10 #$ $Author: serge $
 
 namespace generic_api;
 
 require_once __DIR__.'/../generic_protocol/generic_protocol.php';
 require_once __DIR__.'/../generic_protocol/response_parser.php';    // ResponseParser::parse()
-require_once __DIR__.'/../php_snippets/tcp_send.php';  // tcp_send()
+require_once __DIR__.'/../php_snippets/https_send.php';  // https_post()
 
 class Api
 {
@@ -116,7 +116,7 @@ class Api
 
     private function submit_raw( $command, & $res, & $error_msg )
     {
-        return \tcp_send( $this->host, $this->port, $command . "<EOM>", $res, $error_msg );
+        return \https_post( $this->host, $this->port, $command, $res, $error_msg );
     }
 
     private $host;       // host

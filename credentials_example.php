@@ -1,7 +1,7 @@
 <?php
-// $Revision: 6542 $ $Date:: 2017-04-07 #$ $Author: serge $
+// $Revision: 9822 $ $Date:: 2018-10-10 #$ $Author: serge $
 
-$host = "localhost";
+$host = "https://localhost";
 $port = 1234;
 
 $login    = "test";
