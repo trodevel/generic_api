@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 9821 $ $Date:: 2018-10-10 #$ $Author: serge $
+// $Revision: 9916 $ $Date:: 2018-10-22 #$ $Author: serge $
 
 namespace generic_api;
 
@@ -87,7 +87,12 @@ class Api
 
     protected function parse_response( $resp )
     {
-        return \generic_protocol\ResponseParser::parse( $resp );
+        $res = \generic_protocol\ResponseParser::parse( $resp );
+
+        if( $res != NULL )
+            return $res;
+
+        return \generic_protocol\ResponseParser::create_parse_error();
     }
 
     private function submit_req_and_parse( $req )
