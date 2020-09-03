@@ -1,5 +1,5 @@
 <?php
-// $Revision: 13629 $ $Date:: 2020-09-03 #$ $Author: serge $
+// $Revision: 13644 $ $Date:: 2020-09-04 #$ $Author: serge $
 
 require_once '../api.php';
 require_once '../credentials.php';
@@ -21,7 +21,7 @@ try
 
         if( $api->get_user_id( $session_id, $login, $user_id, $error_msg ) == true )
         {
-            echo "OK: $login --> user_id $user_id\n";
+            echo "OK: login '$login' --> user_id $user_id\n";
         }
         else
         {

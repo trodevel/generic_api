@@ -1,5 +1,5 @@
 <?php
-// $Revision: 13629 $ $Date:: 2020-09-03 #$ $Author: serge $
+// $Revision: 13643 $ $Date:: 2020-09-04 #$ $Author: serge $
 
 require_once '../api.php';
 require_once '../credentials.php';
@@ -34,11 +34,11 @@ try
 
         if( $api->close_session( $session_id, $error_msg ) == true )
         {
-            echo "OK: session closed\n";
+            echo "ERROR: session closed unexpectedly\n";
         }
         else
         {
-            echo "ERROR: cannot close session: $error_msg\n";
+            echo "OK: cannot close session: $error_msg\n";
         }
     }
     else

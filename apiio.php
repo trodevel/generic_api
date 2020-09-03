@@ -21,7 +21,7 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 13633 $ $Date:: 2020-09-03 #$ $Author: serge $
+// $Revision: 13640 $ $Date:: 2020-09-04 #$ $Author: serge $
 
 namespace generic_api;
 
@@ -63,9 +63,9 @@ class ApiIO
     {
         $encoded_req = $this->to_generic_request( $req );
 
-        var_dump( $req );
+        //var_dump( $req );
 
-        echo "DEBUG: submit_req_and_parse: encoded_req $encoded_req\n";
+        //echo "DEBUG: submit_req_and_parse: encoded_req $encoded_req\n";
 
         return $this->submit_raw_and_parse( $encoded_req );
     }
