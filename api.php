@@ -21,27 +21,27 @@ along with this program. If not, see <http://www.gnu.org/licenses/>.
 
 */
 
-// $Revision: 9916 $ $Date:: 2018-10-22 #$ $Author: serge $
+// $Revision: 13645 $ $Date:: 2020-09-04 #$ $Author: serge $
 
 namespace generic_api;
 
-require_once __DIR__.'/../generic_protocol/generic_protocol.php';
-require_once __DIR__.'/../generic_protocol/response_parser.php';    // ResponseParser::parse()
-require_once __DIR__.'/../php_snippets/https_send.php';  // https_post()
+require_once __DIR__.'/../generic_protocol/object_initializer.php';
+require_once __DIR__.'/apiio.php';  // ApiIO
 
 class Api
 {
     function __construct( $host, $port )
     {
-        $this->host = $host;
-        $this->port = $port;
+        $this->apiio = new ApiIO( $host, $port );
     }
 
     public function open_session( $login, $password, & $session_id, & $error_msg )
     {
-        $req = new \generic_protocol\AuthenticateRequest( $login, $password );
+        //echo "TRACE: login $login, password $password\n";
 
-        $resp = $this->submit_req_and_parse( $req );
+        $req = \generic_protocol\create__AuthenticateRequest( $login, $password );
+
+        $resp = $this->apiio->submit( $req );
 
         if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
         {
@@ -54,16 +54,14 @@ class Api
             return true;
         }
 
-        $error_msg = "unknown response";
-
-        return false;
+        throw new InternalException( "unexpected response: " . get_class( $resp ) );
     }
 
     public function close_session( $session_id, & $error_msg )
     {
-        $req = new \generic_protocol\CloseSessionRequest( $session_id );
+        $req = \generic_protocol\create__CloseSessionRequest( $session_id );
 
-        $resp = $this->submit_req_and_parse( $req );
+        $resp = $this->apiio->submit( $req );
 
         if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
         {
@@ -75,57 +73,55 @@ class Api
             return true;
         }
 
-        $error_msg = "unknown response";
-
-        return false;
+        throw new InternalException( "unexpected response: " . get_class( $resp ) );
     }
 
-    public function submit( $req )
+    public function get_user_id( $session_id, $login, & $user_id, & $error_msg )
     {
-        return $this->submit_req_and_parse( $req );
-    }
+        $req = \generic_protocol\create__GetUserIdRequest( $session_id, $login );
 
-    protected function parse_response( $resp )
-    {
-        $res = \generic_protocol\ResponseParser::parse( $resp );
+        $resp = $this->apiio->submit( $req );
 
-        if( $res != NULL )
-            return $res;
-
-        return \generic_protocol\ResponseParser::create_parse_error();
-    }
-
-    private function submit_req_and_parse( $req )
-    {
-        return $this->submit_raw_and_parse( $req->to_generic_request() );
-    }
-
-    private function submit_raw_and_parse( $command )
-    {
-        $resp = "";
-        $error_msg = "";
-
-        $b = $this->submit_raw( $command, $resp, $error_msg );
-
-        if( $b == true )
+        if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
         {
-            $parsed = $this->parse_response( $resp );
+            $error_msg = $resp->descr;
+
+            return false;
         }
-        else
+        elseif( get_class( $resp ) == "generic_protocol\GetUserIdResponse" )
         {
-            $parsed = new \generic_protocol\ErrorResponse( \generic_protocol\ErrorResponse::RUNTIME_ERROR, $error_msg );
+            $user_id = $resp->user_id;
+
+            return true;
         }
 
-        return $parsed;
+        throw new InternalException( "unexpected response: " . get_class( $resp ) );
     }
 
-    private function submit_raw( $command, & $res, & $error_msg )
+    public function get_session_info( $session_id, $session_id_2, & $session_info, & $error_msg )
     {
-        return \https_post( $this->host, $this->port, $command, $res, $error_msg );
+        $req = \generic_protocol\create__GetSessionInfoRequest( $session_id, $session_id_2 );
+
+        $resp = $this->apiio->submit( $req );
+
+        if( get_class ( $resp ) == "generic_protocol\ErrorResponse" )
+        {
+            $error_msg = $resp->descr;
+
+            return false;
+        }
+        elseif( get_class( $resp ) == "generic_protocol\GetSessionInfoResponse" )
+        {
+            $session_info = $resp->session_info;
+
+            return true;
+        }
+
+        throw new InternalException( "unexpected response: " . get_class( $resp ) );
     }
 
-    private $host;       // host
-    private $port;       // port
+
+    private $apiio;  // ApiIO
 }
 
 ?>
